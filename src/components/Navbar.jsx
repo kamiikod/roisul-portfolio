@@ -9,6 +9,7 @@ const links = [
 // Experience ada di bawah Hero, jadi dihitung sebagai bagian "Home".
 const sectionToLink = {
   home: "home",
+  about: "about",
   experience: "home",
   projects: "projects",
   contact: "contact",

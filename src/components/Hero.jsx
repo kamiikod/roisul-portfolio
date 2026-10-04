@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { profile } from "../data/profile";
+import { Code, Terminal, Palette, Sparkles } from "lucide-react";
 
 const ROLE = "Software Designer";
 
@@ -22,6 +23,60 @@ const TIMELINE = [
 const CYCLE = 12000;
 const START_DELAY = 2200;
 
+const DECOR = [
+  {
+    id: "palette",
+    icon: Palette,
+    className: "decor--icon",
+    style: {
+      left: "10%",
+      top: "19%",
+      "--w": "clamp(56px, 7.5vw, 110px)",
+      "--r": "-8deg",
+      "--depth": 14,
+      "--d": "0s",
+    },
+  },
+  {
+    id: "code",
+    icon: Code,
+    className: "decor--icon",
+    style: {
+      right: "10%",
+      top: "19%",
+      "--w": "clamp(56px, 7.5vw, 110px)",
+      "--r": "7deg",
+      "--depth": 22,
+      "--d": "0.12s",
+    },
+  },
+  {
+    id: "sparkles",
+    icon: Sparkles,
+    className: "decor--icon",
+    style: {
+      left: "12%",
+      bottom: "17%",
+      "--w": "clamp(48px, 6.5vw, 96px)",
+      "--r": "5deg",
+      "--depth": 18,
+      "--d": "0.24s",
+    },
+  },
+  {
+    id: "terminal",
+    icon: Terminal,
+    className: "decor--icon",
+    style: {
+      right: "13%",
+      bottom: "17%",
+      "--w": "clamp(48px, 6.5vw, 96px)",
+      "--r": "-12deg",
+      "--depth": 28,
+      "--d": "0.36s",
+    },
+  },
+];
 const GRID = 26;
 const SPOT = 360;
 
@@ -65,6 +120,16 @@ export default function Hero({ ready = true }) {
       const y = Math.round((clientY - rect.top - SPOT / 2) / GRID) * GRID;
       if (spotRef.current)
         spotRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+
+      // Parallax aset: -1..1 dari tengah hero
+      currentTarget.style.setProperty(
+        "--px",
+        ((clientX - rect.left) / rect.width - 0.5) * 2,
+      );
+      currentTarget.style.setProperty(
+        "--py",
+        ((clientY - rect.top) / rect.height - 0.5) * 2,
+      );
     });
   };
 
@@ -77,6 +142,25 @@ export default function Hero({ ready = true }) {
     >
       <div className="hero__dots" aria-hidden="true" />
       <div ref={spotRef} className="hero__spot" aria-hidden="true" />
+      <div className="hero__decor" aria-hidden="true">
+        {DECOR.map((item) => (
+          <span key={item.id} className="decor" style={item.style}>
+            {item.icon ? (
+              <span className={`decor__img ${item.className}`}>
+                <item.icon strokeWidth={1.75} />
+              </span>
+            ) : (
+              <img
+                className={`decor__img ${item.className}`}
+                src={item.src}
+                alt=""
+                draggable="false"
+                decoding="async"
+              />
+            )}
+          </span>
+        ))}
+      </div>
 
       <div className="container hero__inner">
         <div className="hero__stage" data-phase={phase}>

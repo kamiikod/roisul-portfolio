@@ -5,6 +5,7 @@ import Experience from "./components/Experience";
 import Projects from "./components/Projects";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
+import About from "./components/About";
 import Loader from "./components/Loader";
 import { initLenis, lockScroll, unlockScroll } from "./lib/lenis";
 
@@ -40,6 +41,7 @@ export default function App() {
       <Navbar />
       <main>
         <Hero ready={stage !== "loading"} />
+        <About />
         <Experience />
         <Projects />
         <Contact />

@@ -1,65 +1,85 @@
-import { CalendarDays, ImageIcon } from 'lucide-react'
-import { certificates, experiences } from '../data/profile'
-import SectionHeading from './SectionHeading'
+import { useEffect, useRef, useState } from "react";
+import { certificates, experiences } from "../data/profile";
+import SectionHeading from "./SectionHeading";
 
-function CertificateGallery() {
+function CertificateStack() {
   return (
-    <ul className="certs" aria-label="Galeri sertifikat">
-      {certificates.map((cert) => (
-        <li key={cert.id} className="cert">
-          <div className="cert__frame">
-            {cert.image ? (
-              <img src={cert.image} alt={cert.title} loading="lazy" />
-            ) : (
-              <div className="cert__placeholder">
-                <ImageIcon size={26} aria-hidden="true" />
-                <span>Foto sertifikat</span>
-              </div>
-            )}
-          </div>
-          <p>{cert.title}</p>
+    <ul
+      className="stack"
+      style={{ "--count": certificates.length }}
+      tabIndex={0}
+      aria-label="Certificates"
+    >
+      {certificates.map((cert, i) => (
+        <li
+          key={cert.id}
+          className="stack__card"
+          style={{ "--i": i, zIndex: certificates.length - i }}
+        >
+          {cert.image ? (
+            <img src={cert.image} alt={cert.title} loading="lazy" />
+          ) : (
+            <span className="stack__empty">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+          )}
         </li>
       ))}
     </ul>
-  )
+  );
 }
 
 export default function Experience() {
-  return (
-    <section id="experience" className="section" aria-labelledby="experience-title">
-      <div className="container">
-        <SectionHeading
-          id="experience-title"
-          title="Experience"
-          description="Organisasi dan pendidikan yang membentuk cara saya belajar dan bekerja."
-        />
+  const ref = useRef(null);
+  const [shown, setShown] = useState(false);
 
-        <ol className="timeline">
-          {experiences.map((item) => (
-            <li key={item.id} className="timeline__item">
-              <span className="timeline__dot" aria-hidden="true" />
-              <article className="card timeline__card">
-                <header className="timeline__head">
-                  <div>
-                    <h3>{item.organization}</h3>
-                    <p className="timeline__role">{item.role}</p>
-                  </div>
-                  <p className="timeline__period">
-                    <CalendarDays size={16} aria-hidden="true" />
-                    {item.period}
-                  </p>
-                </header>
-                <ul className="timeline__points">
-                  {item.points.map((point) => (
-                    <li key={point}>{point}</li>
-                  ))}
-                </ul>
-                {item.id === 'smk' && <CertificateGallery />}
-              </article>
+  // Muncul sekali saat masuk layar.
+  useEffect(() => {
+    const node = ref.current;
+    if (!node) return undefined;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShown(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.2 },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section
+      id="experience"
+      className="section exp"
+      aria-labelledby="experience-title"
+    >
+      <div ref={ref} className={`container ${shown ? "is-shown" : ""}`}>
+        <SectionHeading id="experience-title" title="Experience" />
+
+        <ol className="exp__list">
+          {experiences.map((item, i) => (
+            <li key={item.id} className="exp__row" style={{ "--r": i }}>
+              <p className="exp__period">
+                {item.current && (
+                  <span className="exp__live" aria-hidden="true" />
+                )}
+                {item.period}
+              </p>
+
+              <div>
+                <h3 className="exp__org">{item.organization}</h3>
+                <p className="exp__role">{item.role}</p>
+                <p className="exp__summary">{item.summary}</p>
+              </div>
+
+              {item.showCertificates && <CertificateStack />}
             </li>
           ))}
         </ol>
       </div>
     </section>
-  )
+  );
 }

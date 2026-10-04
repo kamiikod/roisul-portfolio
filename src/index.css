@@ -205,6 +205,8 @@ a {
   color: var(--ink);
 }
 .hero__inner {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -465,6 +467,103 @@ a {
   }
 }
 
+/* ---------- Hero: aset yang mengelilingi nama ---------- */
+.hero__decor {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.decor {
+  --px: 0;
+  --py: 0;
+  position: absolute;
+  width: var(--w);
+  transform: translate3d(
+    calc(var(--px, 0) * var(--depth) * -1px),
+    calc(var(--py, 0) * var(--depth) * -1px),
+    0
+  );
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.decor__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  transform: rotate(var(--r));
+}
+.decor--photo {
+  aspect-ratio: 1;
+  object-fit: cover;
+  padding: 5px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow: var(--shadow);
+}
+.decor--card {
+  padding: 5px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+.decor--icon {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  color: #fff;
+  background: var(--ink);
+  border-radius: 26%;
+  box-shadow: var(--shadow);
+}
+.decor--icon svg {
+  width: 50%;
+  height: 50%;
+}
+.hero:not(.is-ready) .decor {
+  opacity: 0;
+}
+
+@media (hover: none) {
+  .decor {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero.is-ready .decor__img {
+    animation:
+      decor-in 0.8s var(--d) cubic-bezier(0.2, 0.9, 0.3, 1.2) both,
+      decor-float 6s calc(0.8s + var(--d)) ease-in-out infinite;
+  }
+}
+@keyframes decor-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.6) rotate(calc(var(--r) - 12deg));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(var(--r));
+  }
+}
+@keyframes decor-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(var(--r));
+  }
+  50% {
+    transform: translateY(-10px) rotate(calc(var(--r) + 2deg));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .decor {
+    transition: none;
+  }
+}
+
 /* ---------- Sections ---------- */
 .section {
   padding: clamp(3.5rem, 8vw, 6rem) 0;
@@ -494,137 +593,295 @@ a {
   box-shadow: var(--shadow);
 }
 
-/* ---------- Experience / timeline ---------- */
-.timeline {
-  position: relative;
+/* ---------- Intro (pengganti About) ---------- */
+.intro {
+  padding-block: clamp(4rem, 10vw, 8rem);
+}
+.intro__inner {
   display: grid;
-  gap: 1.75rem;
-  padding-left: 2.25rem;
-}
-.timeline::before {
-  content: "";
-  position: absolute;
-  left: 7px;
-  top: 12px;
-  bottom: 12px;
-  width: 2px;
-  background: var(--line);
-}
-.timeline__item {
-  position: relative;
-}
-.timeline__dot {
-  position: absolute;
-  left: -2.25rem;
-  top: 1.7rem;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--surface);
-  border: 4px solid var(--brand);
-}
-.timeline__card {
-  padding: 1.75rem;
-}
-.timeline__head {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-.timeline__head h3 {
-  font-size: 1.45rem;
-  font-weight: 700;
-}
-.timeline__role {
-  color: var(--brand);
-  font-weight: 700;
-  margin-top: 0.2rem;
-}
-.timeline__period {
-  display: inline-flex;
+  grid-template-columns: 1.618fr 1fr;
+  gap: 3.236rem;
   align-items: center;
-  gap: 0.4rem;
-  align-self: flex-start;
-  padding: 0.3rem 0.8rem;
-  border-radius: 999px;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  font-size: 0.9rem;
-  color: var(--muted);
 }
-.timeline__points {
-  display: grid;
-  gap: 0.5rem;
-}
-.timeline__points li {
-  position: relative;
-  padding-left: 1.25rem;
-  color: var(--muted);
-}
-.timeline__points li::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0.72em;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--brand);
+.intro__text {
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 3.8vw, 3rem);
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.03em;
 }
 
-.certs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  margin-top: 1.75rem;
+/* Chip di dalam kalimat */
+.intro__chip,
+.intro__photo {
+  display: inline-block;
+  vertical-align: middle;
+  height: 1.05em;
+  border-radius: 999px;
+  line-height: 1;
 }
-.cert p {
-  margin-top: 0.5rem;
+.intro__chip {
+  padding: 0.08em 0.4em 0.14em;
+  height: auto;
+  border: 0.07em solid var(--ink);
+}
+.intro__chip--dark {
+  background: var(--ink);
+  color: #fff;
+}
+.intro__photo {
+  position: relative;
+  width: 1.9em;
+  overflow: hidden;
+  background: var(--tint);
+  border: 0.07em solid var(--ink);
+  transform: translateY(-0.06em);
+}
+.intro__photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 28%;
+  filter: grayscale(1) contrast(1.05); /* hapus baris ini kalau mau foto berwarna */
+}
+
+/* Baris fakta */
+.intro__facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 1.25rem 1.618rem;
+  margin: 3.236rem 0 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+.intro__facts dt {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.intro__facts dd {
+  margin: 0.15rem 0 0;
+  font-weight: 700;
+}
+
+/* Link sosmed */
+.intro__social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.618rem;
+}
+.intro__social a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
   font-size: 0.92rem;
   font-weight: 500;
-  text-align: center;
+  text-decoration: none;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
-.cert__frame {
-  aspect-ratio: 4 / 3;
-  border-radius: 12px;
+.intro__social a:hover {
+  background: var(--ink);
+  color: #fff;
+}
+
+/* Gambar samping */
+.intro__art {
+  margin: 0;
+  justify-self: center;
+  width: min(100%, 340px);
+}
+.intro__art img {
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 860px) {
+  .intro__inner {
+    grid-template-columns: 1fr;
+    gap: 2.618rem;
+  }
+  .intro__art {
+    justify-self: start;
+    width: min(100%, 220px);
+  }
+}
+
+/* Muncul halus sekali saat masuk layar */
+@media (prefers-reduced-motion: no-preference) {
+  .intro__inner:not(.is-shown) .intro__text,
+  .intro__inner:not(.is-shown) .intro__facts,
+  .intro__inner:not(.is-shown) .intro__art {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  .intro__text,
+  .intro__facts,
+  .intro__art {
+    transition:
+      opacity 0.8s ease,
+      transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  .intro__facts {
+    transition-delay: 0.15s;
+  }
+  .intro__art {
+    transition-delay: 0.3s;
+  }
+
+  /* Opsional: ikon bergerak miring pelan. Hapus blok ini kalau nggak mau. */
+  .intro__inner.is-shown .intro__art img {
+    animation: tumble 5s 1s ease-in-out infinite;
+  }
+}
+
+@keyframes tumble {
+  0%,
+  100% {
+    transform: rotate(-4deg) translateY(0);
+  }
+  50% {
+    transform: rotate(5deg) translateY(-10px);
+  }
+}
+/* ---------- Experience / timeline ---------- */
+/* ---------- Experience ---------- */
+.exp__list {
+  border-top: 2px solid var(--ink);
+}
+.exp__row {
+  display: grid;
+  grid-template-columns: 11rem 1fr auto;
+  gap: 1.618rem 2rem;
+  align-items: center;
+  padding: 2.25rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.exp__period {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font: 500 0.95rem/1.4 var(--font-mono);
+  color: var(--muted);
+}
+.exp__org {
+  font-size: clamp(1.7rem, 4vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.exp__role {
+  margin-top: 0.35rem;
+  font-weight: 700;
+}
+.exp__summary {
+  max-width: 34rem;
+  margin-top: 0.6rem;
+  color: var(--muted);
+}
+
+/* Titik "sedang berjalan" */
+.exp__live {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ink);
+}
+.exp__live::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--ink);
+}
+
+/* Tumpukan sertifikat: melebar seperti kipas saat hover / fokus */
+.stack {
+  --w: 112px;
+  --step: 68px;
+  position: relative;
+  width: calc(var(--w) + (var(--count) - 1) * var(--step));
+  height: 84px;
+}
+.stack__card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: var(--w);
+  height: 84px;
   overflow: hidden;
-  border: 1px solid var(--line);
-  background: var(--bg);
+  border: 2px solid var(--ink);
+  border-radius: 10px;
+  background: #fff;
+  transform: translateX(calc(var(--i) * 10px))
+    rotate(calc((var(--i) - 1) * 4deg));
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
-.cert__frame img {
+.stack__card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
-.cert__placeholder {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
+.stack__empty {
+  font: 500 0.85rem/1 var(--font-mono);
   color: var(--muted);
-  font-size: 0.82rem;
-  border: 2px dashed var(--line);
-  border-radius: 12px;
-  margin: 0.4rem;
-  height: calc(100% - 0.8rem);
+}
+.exp__row:hover .stack__card,
+.exp__row:focus-within .stack__card {
+  transform: translateX(calc(var(--i) * var(--step))) rotate(0);
+}
+/* Layar sentuh nggak punya hover, jadi langsung melebar */
+@media (hover: none) {
+  .stack__card {
+    transform: translateX(calc(var(--i) * var(--step))) rotate(0);
+  }
 }
 
-@media (max-width: 560px) {
-  .timeline {
-    padding-left: 1.75rem;
+@media (max-width: 860px) {
+  .exp__row {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1.75rem 0;
   }
-  .timeline__dot {
-    left: -1.75rem;
+  .stack {
+    justify-self: start;
+    margin-top: 0.5rem;
   }
-  .timeline__card {
-    padding: 1.25rem;
+}
+
+/* Muncul halus sekali saat masuk layar + titik berdenyut */
+@media (prefers-reduced-motion: no-preference) {
+  .exp:not(:has(.is-shown)) .exp__row,
+  .exp__row {
+    transition:
+      opacity 0.8s ease,
+      transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition-delay: calc(var(--r) * 0.15s);
   }
-  .certs {
-    grid-template-columns: 1fr 1fr;
+  .exp:not(:has(.is-shown)) .exp__row {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  .exp__live::after {
+    animation: ping 1.8s ease-out infinite;
+  }
+}
+@keyframes ping {
+  from {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.6);
   }
 }
 
