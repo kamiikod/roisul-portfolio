@@ -39,17 +39,19 @@ export default function Loader({ exiting, onTyped }) {
         <div className="loader__name">
           <span className={`loader__line ${started ? "is-playing" : ""}`}>
             <span className="loader__text">{profile.name}</span>
-            <span className="loader__cursor">
-              <svg width="22" height="22" viewBox="0 0 24 24">
-                <path
-                  d="M3 2l7.5 19 2.6-7.9L21 10.5z"
-                  fill="#111111"
-                  stroke="#ffffff"
-                  strokeWidth="1.5"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="loader__cursor-label">Roisul</span>
+            <span className="loader__cover">
+              <span className="loader__cursor">
+                <svg width="22" height="22" viewBox="0 0 24 24">
+                  <path
+                    d="M3 2l7.5 19 2.6-7.9L21 10.5z"
+                    fill="#111111"
+                    stroke="#ffffff"
+                    strokeWidth="1.5"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <span className="loader__cursor-label">Roisul</span>
+              </span>
             </span>
           </span>
         </div>

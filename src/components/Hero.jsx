@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { profile } from "../data/profile";
 
 const ROLE = "Software Designer";
@@ -22,9 +22,16 @@ const TIMELINE = [
 const CYCLE = 12000;
 const START_DELAY = 2200;
 
+const GRID = 26;
+const SPOT = 360;
+
 export default function Hero({ ready = true }) {
   const [phase, setPhase] = useState("idle");
   const [fontIndex, setFontIndex] = useState(0);
+  const spotRef = useRef(null);
+  const frame = useRef(0);
+
+  useEffect(() => () => cancelAnimationFrame(frame.current), []);
 
   useEffect(() => {
     if (!ready) return undefined;
@@ -48,17 +55,17 @@ export default function Hero({ ready = true }) {
     return () => timers.forEach(clearTimeout);
   }, [ready]);
 
-  // Spotlight titik mengikuti mouse (tanpa re-render).
+  // Spotlight digeser lewat transform, di-throttle per frame.
   const handlePointerMove = (event) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    event.currentTarget.style.setProperty(
-      "--mx",
-      `${event.clientX - rect.left}px`,
-    );
-    event.currentTarget.style.setProperty(
-      "--my",
-      `${event.clientY - rect.top}px`,
-    );
+    const { clientX, clientY, currentTarget } = event;
+    cancelAnimationFrame(frame.current);
+    frame.current = requestAnimationFrame(() => {
+      const rect = currentTarget.getBoundingClientRect();
+      const x = Math.round((clientX - rect.left - SPOT / 2) / GRID) * GRID;
+      const y = Math.round((clientY - rect.top - SPOT / 2) / GRID) * GRID;
+      if (spotRef.current)
+        spotRef.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+    });
   };
 
   return (
@@ -69,7 +76,7 @@ export default function Hero({ ready = true }) {
       onPointerMove={handlePointerMove}
     >
       <div className="hero__dots" aria-hidden="true" />
-      <div className="hero__spot" aria-hidden="true" />
+      <div ref={spotRef} className="hero__spot" aria-hidden="true" />
 
       <div className="container hero__inner">
         <div className="hero__stage" data-phase={phase}>

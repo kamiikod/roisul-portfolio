@@ -212,31 +212,32 @@ a {
 }
 
 /* Pola titik + spotlight yang mengikuti mouse */
-.hero__dots,
-.hero__spot {
+.hero__dots {
   position: absolute;
   inset: 0;
   z-index: -1;
   pointer-events: none;
+  opacity: 0.09;
   background: radial-gradient(circle, var(--ink) 1px, transparent 1.5px) 0 0 /
     26px 26px;
 }
-.hero__dots {
-  opacity: 0.09;
-}
 .hero__spot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 360px;
+  height: 360px;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(circle, var(--ink) 1px, transparent 1.5px) 0 0 /
+    26px 26px;
+  -webkit-mask-image: radial-gradient(circle closest-side, #000, transparent);
+  mask-image: radial-gradient(circle closest-side, #000, transparent);
   opacity: 0;
-  transition: opacity 0.4s ease;
-  -webkit-mask-image: radial-gradient(
-    circle 200px at var(--mx, 50%) var(--my, 45%),
-    #000,
-    transparent
-  );
-  mask-image: radial-gradient(
-    circle 200px at var(--mx, 50%) var(--my, 45%),
-    #000,
-    transparent
-  );
+  will-change: transform;
+  transition:
+    transform 0.15s linear,
+    opacity 0.4s ease;
 }
 @media (hover: hover) {
   .hero:hover .hero__spot {
@@ -373,7 +374,6 @@ a {
   opacity: 0;
 }
 
-/* Role: efek mengetik + caret */
 /* Role: huruf naik satu-satu */
 .hero__role {
   margin-top: 1.5rem;
@@ -389,16 +389,6 @@ a {
 .hero:not(.is-ready) .hero__letter {
   opacity: 0;
 }
-
-/* .hero__typed {
-  display: inline-block;
-  width: 17ch;
-  overflow: hidden;
-  white-space: nowrap;
-  vertical-align: bottom;
-  font-family: var(--font-mono);
-  border-right: 2px solid var(--ink);
-} */
 
 /* Scroll cue */
 .hero__scroll {
@@ -429,24 +419,6 @@ a {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .hero__stage {
-    animation: rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-  }
-  .hero__role {
-    animation: rise 0.8s 0.12s cubic-bezier(0.2, 0.7, 0.2, 1) both;
-  }
-  .hero__text {
-    animation: swap 0.3s ease-out both;
-  }
-  .hero__typed {
-    animation:
-      typing 1.5s 0.7s steps(17) both,
-      caret 0.9s step-end infinite;
-  }
-  .hero__scroll::after {
-    animation: wheel 1.6s ease-in-out infinite;
-  }
-
   .hero__text {
     animation: swap 0.3s ease-out both;
   }
@@ -458,42 +430,27 @@ a {
     animation: wheel 1.6s ease-in-out infinite;
   }
 }
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
+
 @keyframes swap {
   from {
     opacity: 0.2;
-    filter: blur(6px);
     transform: translateY(0.06em);
   }
   to {
     opacity: 1;
-    filter: none;
     transform: none;
   }
 }
-
 @keyframes letter-in {
   from {
     opacity: 0;
     transform: translateY(0.6em);
-    filter: blur(6px);
   }
   to {
     opacity: 1;
     transform: none;
-    filter: none;
   }
 }
-
 @keyframes wheel {
   0% {
     opacity: 0;
@@ -958,12 +915,6 @@ a.contact__item:hover {
 }
 
 /* ---------- Loader ---------- */
-@property --p {
-  syntax: "<percentage>";
-  inherits: true;
-  initial-value: 0%;
-}
-
 .loader {
   position: fixed;
   inset: 0;
@@ -1002,28 +953,24 @@ a.contact__item:hover {
   position: relative;
   display: inline-block;
 }
-
-/* Nama terungkap lewat mask dengan tepi lembut; --p dianimasikan */
 .loader__text {
   display: inline-block;
-  -webkit-mask-image: linear-gradient(
-    90deg,
-    #000 calc(var(--p) - 8%),
-    transparent var(--p)
-  );
-  mask-image: linear-gradient(
-    90deg,
-    #000 calc(var(--p) - 8%),
-    transparent var(--p)
-  );
 }
 
-/* Kursor mengikuti ujung teks yang terungkap */
+/* Tirai putih menutup nama, lalu bergeser ke kanan (transform saja, jadi ringan) */
+.loader__cover {
+  position: absolute;
+  top: -10%;
+  bottom: -10%;
+  left: -10%;
+  width: 130%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), #fff 10%);
+  will-change: transform;
+}
 .loader__cursor {
   position: absolute;
-  left: calc(var(--p) - 8%);
+  left: 8%;
   top: 62%;
-  margin-left: -2px;
   opacity: 0;
   transition: opacity 0.3s ease;
 }
@@ -1044,17 +991,14 @@ a.contact__item:hover {
   white-space: nowrap;
 }
 
-.loader__line.is-playing {
-  animation: reveal 1.2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+.loader__line.is-playing .loader__cover {
+  animation: sweep 1.2s cubic-bezier(0.65, 0, 0.35, 1) forwards;
 }
 .loader__line.is-playing .loader__cursor {
   opacity: 1;
 }
-@keyframes reveal {
-  from {
-    --p: 0%;
-  }
+@keyframes sweep {
   to {
-    --p: 108%;
+    transform: translateX(100%);
   }
 }
