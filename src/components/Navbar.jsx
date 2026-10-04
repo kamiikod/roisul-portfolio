@@ -16,6 +16,26 @@ const sectionToLink = {
 
 export default function Navbar() {
   const [active, setActive] = useState("home");
+  const [expanded, setExpanded] = useState(true);
+
+  // Expand selama hero masih mengisi sebagian besar layar.
+  useEffect(() => {
+    const hero = document.getElementById("home");
+    if (!hero) return undefined;
+
+    const update = () => {
+      const { bottom } = hero.getBoundingClientRect();
+      setExpanded(bottom > window.innerHeight * 0.4);
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -34,7 +54,7 @@ export default function Navbar() {
   }, []);
 
   return (
-    <header className="navbar">
+    <header className={`navbar ${expanded ? "navbar--expanded" : ""}`}>
       <nav aria-label="Navigasi utama">
         <ul className="navbar__links">
           {links.map((link) => (

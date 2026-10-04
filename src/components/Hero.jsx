@@ -1,65 +1,128 @@
-import { ArrowDown, Mail } from 'lucide-react'
-import { profile } from '../data/profile'
+import { useEffect, useState } from "react";
+import { profile } from "../data/profile";
 
-function ProfilePhoto() {
-  if (profile.photo) {
-    return <img src={profile.photo} alt={`Foto ${profile.name}`} className="hero__photo-img" />
-  }
+const ROLE = "Software Designer";
+
+const FONTS = [
+  { name: "Bricolage Grotesque", className: "font-default" },
+  { name: "Instrument Serif", className: "font-serif" },
+  { name: "JetBrains Mono", className: "font-mono" },
+];
+
+// Satu siklus animasi kursor (ms, dihitung dari awal siklus).
+const TIMELINE = [
+  { at: 0, phase: "moving" },
+  { at: 1200, phase: "selected", font: 0 },
+  { at: 2600, phase: "selected", font: 1 },
+  { at: 4200, phase: "selected", font: 2 },
+  { at: 5800, phase: "selected", font: 0 }, // balik ke font awal
+  { at: 7200, phase: "leaving" },
+  { at: 8200, phase: "idle" },
+];
+const CYCLE = 12000;
+const START_DELAY = 2200;
+
+export default function Hero({ ready = true }) {
+  const [phase, setPhase] = useState("idle");
+  const [fontIndex, setFontIndex] = useState(0);
+
+  useEffect(() => {
+    if (!ready) return undefined;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+      return undefined;
+
+    const timers = [];
+    const run = () => {
+      TIMELINE.forEach((step) => {
+        timers.push(
+          setTimeout(() => {
+            setPhase(step.phase);
+            if (step.font !== undefined) setFontIndex(step.font);
+          }, step.at),
+        );
+      });
+      timers.push(setTimeout(run, CYCLE));
+    };
+
+    timers.push(setTimeout(run, START_DELAY));
+    return () => timers.forEach(clearTimeout);
+  }, [ready]);
+
+  // Spotlight titik mengikuti mouse (tanpa re-render).
+  const handlePointerMove = (event) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    event.currentTarget.style.setProperty(
+      "--mx",
+      `${event.clientX - rect.left}px`,
+    );
+    event.currentTarget.style.setProperty(
+      "--my",
+      `${event.clientY - rect.top}px`,
+    );
+  };
 
   return (
-    <div className="hero__photo-placeholder" role="img" aria-label="Placeholder foto profil">
-      <svg viewBox="0 0 120 120" aria-hidden="true">
-        <circle cx="60" cy="46" r="20" />
-        <path d="M20 112c0-22 18-38 40-38s40 16 40 38z" />
-      </svg>
-      <span>Taruh foto kamu di sini</span>
-    </div>
-  )
-}
+    <section
+      id="home"
+      className={`hero ${ready ? "is-ready" : ""}`}
+      aria-labelledby="hero-title"
+      onPointerMove={handlePointerMove}
+    >
+      <div className="hero__dots" aria-hidden="true" />
+      <div className="hero__spot" aria-hidden="true" />
 
-export default function Hero() {
-  return (
-    <section id="home" className="hero" aria-labelledby="hero-title">
-      <div className="hero__grid-bg" aria-hidden="true" />
       <div className="container hero__inner">
-        <div className="hero__content">
-          <p className="hero__status">
-            <span className="hero__dot" aria-hidden="true" />
-            {profile.status}
-          </p>
-          <h1 id="hero-title">{profile.name}</h1>
-          <p className="hero__lead">
-            Siswa {profile.school} yang suka membuat sesuatu dengan kode. Saya belajar lewat project,
-            lomba, dan kegiatan sekolah, dan sekarang sedang mencari tempat PKL untuk belajar langsung
-            di dunia kerja.
-          </p>
-          <div className="hero__actions">
-            <a className="btn btn--primary" href="#projects">
-              <ArrowDown size={18} aria-hidden="true" />
-              View My Projects
-            </a>
-            <a className="btn btn--ghost" href="#contact">
-              <Mail size={18} aria-hidden="true" />
-              Contact Me
-            </a>
+        <div className="hero__stage" data-phase={phase}>
+          <h1 id="hero-title" className="hero__name">
+            <span
+              key={fontIndex}
+              className={`hero__text ${FONTS[fontIndex].className}`}
+            >
+              {profile.name}
+            </span>
+          </h1>
+
+          <div className="hero__select" aria-hidden="true">
+            <span className="hero__handle" />
+            <span className="hero__handle" />
+            <span className="hero__handle" />
+            <span className="hero__handle" />
+            <span className="hero__tag">{FONTS[fontIndex].name}</span>
+          </div>
+
+          <div className="hero__cursor" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24">
+              <path
+                d="M3 2l7.5 19 2.6-7.9L21 10.5z"
+                fill="#111111"
+                stroke="#ffffff"
+                strokeWidth="1.5"
+                strokeLinejoin="round"
+              />
+            </svg>
+            <span className="hero__cursor-label">Roisul</span>
           </div>
         </div>
 
-        <div className="hero__visual">
-          <div className="hero__photo">
-            <ProfilePhoto />
-          </div>
-          <pre className="hero__code" aria-hidden="true">
-            <code>
-              <span className="tok-k">const</span> <span className="tok-v">roisul</span> = {'{'}
-              {'\n'}  role: <span className="tok-s">"Junior Developer"</span>,
-              {'\n'}  school: <span className="tok-s">"{profile.school}"</span>,
-              {'\n'}  lookingFor: <span className="tok-s">"PKL"</span>,
-              {'\n'}{'}'}
-            </code>
-          </pre>
-        </div>
+        <p className="hero__role" aria-label={ROLE}>
+          {ROLE.split("").map((char, i) => (
+            <span
+              key={i}
+              className="hero__letter"
+              style={{ "--i": i }}
+              aria-hidden="true"
+            >
+              {char === " " ? "\u00A0" : char}
+            </span>
+          ))}
+        </p>
       </div>
+
+      <a
+        className="hero__scroll"
+        href="#experience"
+        aria-label="Scroll ke bawah"
+      />
     </section>
-  )
+  );
 }
